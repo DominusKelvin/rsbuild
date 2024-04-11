@@ -10,17 +10,17 @@ declare global {
 const countMap: Record<string, number> = {};
 const oldLoadScript = __RUNTIME_GLOBAL_ENSURE__CHUNK__;
 
-// biome-ignore lint/complexity/useArrowFunction: use function to have better performance
-__RUNTIME_GLOBAL_ENSURE__CHUNK__ = function (chunkId) {
+function newLoadScript(chunkId: string) {
   const result = oldLoadScript(chunkId);
-  return result.catch((error) => {
+  return result.catch(function (error) {
     const retries = countMap[chunkId] ?? __MAX_RETRIES__;
 
     if (retries < 1) {
       error.message = `Loading chunk ${chunkId} failed after  retries.`;
       throw error;
     }
-    return new Promise((resolve) => {
+    // biome-ignore lint/complexity/useArrowFunction: use function to have better performance
+    return new Promise(function (resolve) {
       const retryAttempt = __MAX_RETRIES__ - retries + 1;
       setTimeout(() => {
         // var retryAttemptString = '&retry-attempt=' + retryAttempt;
@@ -31,4 +31,6 @@ __RUNTIME_GLOBAL_ENSURE__CHUNK__ = function (chunkId) {
       }, 300);
     });
   });
-};
+}
+
+__RUNTIME_GLOBAL_ENSURE__CHUNK__ = newLoadScript;
