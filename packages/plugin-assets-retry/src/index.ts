@@ -1,6 +1,7 @@
 import { getDistPath, isHtmlDisabled } from '@rsbuild/shared';
 import type { RsbuildPlugin } from '@rsbuild/core';
 import type { PluginAssetsRetryOptions } from './types';
+import { AsyncChunkRetryPlugin } from './AsyncChunkRetryPlugin';
 
 export type { PluginAssetsRetryOptions };
 
@@ -39,6 +40,10 @@ export const pluginAssetsRetry = (
           HtmlPlugin,
         },
       ]);
+
+      chain
+        .plugin(CHAIN_ID.PLUGIN.ASYNC_CHUNK_RETRY)
+        .use(AsyncChunkRetryPlugin, []);
     });
   },
 });
