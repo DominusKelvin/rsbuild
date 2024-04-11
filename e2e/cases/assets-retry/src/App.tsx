@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { ErrorBoundary } from './ErrorBoundary';
 
-const Hello = React.lazy(() => import('./Hello'));
+const DemoAsyncTest = React.lazy(() => import('./AsyncCompTest'));
 
 const App = () => {
   return (
@@ -11,7 +11,7 @@ const App = () => {
       <p>Start building amazing things with Rsbuild.</p>
       <div style={{ border: '1px solid white', padding: 20 }}>
         <ErrorBoundary>
-          <Hello />
+          <DemoAsyncTest />
         </ErrorBoundary>
       </div>
     </div>
