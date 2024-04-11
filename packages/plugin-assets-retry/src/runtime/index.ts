@@ -1,3 +1,4 @@
+// rsbuild/initial-chunk/retry
 import type { CrossOrigin } from '@rsbuild/shared';
 import type {
   PluginAssetsRetryOptions,
@@ -99,10 +100,14 @@ function createElement(
     if (attributes.isAsync) {
       script.dataset.rsbuildAsync = '';
     }
-
     return {
       element: script,
-      str: `<script src="${attributes.url}" ${crossOriginAttr} ${retryTimesAttr} ${isAsyncAttr}></script>`,
+      str:
+        // biome-ignore lint/style/useTemplate: template string including html tag causes errors when inlining in html
+        '<script' +
+        `src="${attributes.url}" ${crossOriginAttr} ${retryTimesAttr} ${isAsyncAttr}>` +
+        '</' +
+        'script>',
     };
   }
   if (origin instanceof HTMLLinkElement) {
@@ -122,11 +127,14 @@ function createElement(
     }
     return {
       element: link,
-      str: `<link rel="${link.rel}" href="${
-        attributes.url
-      }" ${crossOriginAttr} ${retryTimesAttr} ${
-        link.as ? `as="${link.as}"` : ''
-      }></link>`,
+      str:
+        // biome-ignore lint/style/useTemplate: template string including html tag causes errors when inlining in html
+        '<link' +
+        `rel="${link.rel}" href="${
+          attributes.url
+        }" ${crossOriginAttr} ${retryTimesAttr} ${
+          link.as ? `as="${link.as}"` : ''
+        }></link>`,
     };
   }
 }
