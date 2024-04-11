@@ -1,4 +1,7 @@
+import { fse } from '@rsbuild/shared';
 import { Rspack } from '@rsbuild/shared/rspack';
+import path from 'node:path';
+import type { PluginAssetsRetryOptions } from './types';
 
 const { RuntimeGlobals } = Rspack;
 
@@ -13,46 +16,36 @@ function appendScript(module: any, appendSource: string) {
 
 class AsyncChunkRetryPlugin implements Rspack.RspackPluginInstance {
   readonly name = 'ASYNC_CHUNK_RETRY_PLUGIN';
+  readonly options: PluginAssetsRetryOptions;
+
+  constructor(options: PluginAssetsRetryOptions) {
+    this.options = options;
+  }
+
+  getRawRuntimeRetryCode() {
+    const filename = 'asyncChunkRetry';
+    const runtimeFilePath = path.join(
+      __dirname,
+      'runtime',
+      this.options?.minify ? `${filename}.min.js` : `${filename}.js`,
+    );
+    const rawText = fse.readFileSync(runtimeFilePath, 'utf-8');
+    const maxRetries = 3;
+
+    return rawText
+      .replaceAll(
+        '__RUNTIME_GLOBAL_ENSURE__CHUNK__',
+        RuntimeGlobals.ensureChunk,
+      )
+      .replaceAll('__MAX_RETRIES__', String(maxRetries));
+  }
 
   apply(compiler: Rspack.Compiler): void {
     compiler.hooks.thisCompilation.tap(this.name, (compilation) => {
       compilation.hooks.runtimeModule.tap(this.name, (module, _chunk) => {
-        const maxRetries = 3;
-        function getCacheBustString() {
-          return '';
-        }
         if (module.constructorName === 'EnsureChunkRuntimeModule') {
-          const appendSource = `
-          // rsbuild/asset-retry/runtime
-          !function() {
-            var countMap = {};
-
-            var oldLoadScript = ${RuntimeGlobals.ensureChunk};
-            ${RuntimeGlobals.ensureChunk} = function(chunkId){
-              var result = oldLoadScript(chunkId);
-              return result.catch(function(error){
-                var retries = countMap.hasOwnProperty(chunkId) ? countMap[chunkId] : ${maxRetries};
-                if (retries < 1) {
-                  var realSrc = oldGetScript(chunkId);
-                  error.message = 'Loading chunk ' + chunkId + ' failed after ${maxRetries} retries.\\n(' + realSrc + ')';
-                  error.request = realSrc;${''}
-                  throw error;
-                }
-                return new Promise(function (resolve) {
-                  var retryAttempt = ${maxRetries} - retries + 1;
-                  setTimeout(function () {
-                    // var retryAttemptString = '&retry-attempt=' + retryAttempt;
-                    // var cacheBust = ${getCacheBustString()} + retryAttemptString;
-                    // queryMap[chunkId] = cacheBust;
-                    countMap[chunkId] = retries - 1;
-                    resolve(${RuntimeGlobals.ensureChunk}(chunkId));
-                  }, 300)
-                })
-              });
-            };
-          }()
-          `;
-          appendScript(module, appendSource);
+          const runtimeCode = this.getRawRuntimeRetryCode();
+          appendScript(module, runtimeCode);
         }
       });
     });

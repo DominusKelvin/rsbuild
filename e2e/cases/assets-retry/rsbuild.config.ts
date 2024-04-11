@@ -14,9 +14,9 @@ export default defineConfig({
       (middlewares, _server) => {
         middlewares.unshift((req, res, next) => {
           if (req.url?.startsWith('/static/js/async')) {
-            if (counter % 3 !== 0) {
-              res.statusCode = 404;
-            }
+            // if (counter % 3 !== 0) {
+            res.statusCode = 404;
+            // }
             counter++;
             res.setHeader('block-async', JSON.stringify(counter));
           }
