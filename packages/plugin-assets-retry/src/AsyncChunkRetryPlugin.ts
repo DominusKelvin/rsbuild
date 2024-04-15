@@ -23,7 +23,7 @@ class AsyncChunkRetryPlugin implements Rspack.RspackPluginInstance {
   }
 
   getRawRuntimeRetryCode() {
-    const filename = 'asyncChunkRetry';
+    const filename = 'runtimeGlobalsEnsure';
     const runtimeFilePath = path.join(
       __dirname,
       'runtime',

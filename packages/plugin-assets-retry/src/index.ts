@@ -43,7 +43,7 @@ export const pluginAssetsRetry = (
 
       chain
         .plugin(CHAIN_ID.PLUGIN.ASYNC_CHUNK_RETRY)
-        .use(AsyncChunkRetryPlugin, []);
+        .use(AsyncChunkRetryPlugin, [{ ...options }]);
     });
   },
 });

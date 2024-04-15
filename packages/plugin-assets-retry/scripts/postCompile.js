@@ -50,7 +50,7 @@ async function compile() {
   await mkdir(path.join(__dirname, '../dist/runtime'));
   await Promise.all([
     compileRuntimeFile('initialChunkRetry'),
-    compileRuntimeFile('asyncChunkRetry'),
+    compileRuntimeFile('runtimeGlobalsEnsure'),
   ]);
   console.log(
     `Compiled assets retry runtime code. Time cost: ${(

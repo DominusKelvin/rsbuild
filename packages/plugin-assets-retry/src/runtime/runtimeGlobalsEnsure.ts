@@ -8,18 +8,18 @@ declare global {
 
 // rsbuild/async-chunk-retry/runtime
 const countMap: Record<string, number> = {};
-const oldLoadScript = __RUNTIME_GLOBAL_ENSURE__CHUNK__;
+const originalEnsureChunk = __RUNTIME_GLOBAL_ENSURE__CHUNK__;
 
-function newLoadScript(chunkId: string) {
-  const result = oldLoadScript(chunkId);
+function ensureChunk(chunkId: string) {
+  const result = originalEnsureChunk(chunkId);
   return result.catch(function (error) {
     const retries = countMap[chunkId] ?? __MAX_RETRIES__;
 
     if (retries < 1) {
-      error.message = `Loading chunk ${chunkId} failed after  retries.`;
+      error.message = `Loading chunk ${chunkId} failed after ${__MAX_RETRIES__} retries.`;
       throw error;
     }
-    // biome-ignore lint/complexity/useArrowFunction: use function to have better performance
+    // biome-ignore lint/complexity/useArrowFunction: use function instead of () => {}
     return new Promise(function (resolve) {
       const retryAttempt = __MAX_RETRIES__ - retries + 1;
       setTimeout(() => {
@@ -33,4 +33,4 @@ function newLoadScript(chunkId: string) {
   });
 }
 
-__RUNTIME_GLOBAL_ENSURE__CHUNK__ = newLoadScript;
+__RUNTIME_GLOBAL_ENSURE__CHUNK__ = ensureChunk;
