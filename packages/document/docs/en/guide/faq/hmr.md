@@ -2,7 +2,7 @@
 
 ### How to troubleshooting HMR ineffective issues?
 
-There are several possible reasons why HMR may not be work. This document will cover most common causes and provide guidance for troubleshooting. Please refer to the following content for troubleshooting.
+There are several possible reasons why HMR may not work. This document will cover most common causes and provide guidance for troubleshooting. Please refer to the following content for troubleshooting.
 
 Before starting the troubleshooting process, it is helpful to have a basic understanding of how HMR works:
 
